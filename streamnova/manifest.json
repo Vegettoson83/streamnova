@@ -6,8 +6,18 @@
   "resources": ["catalog", "stream"],
   "types": ["movie", "series"],
   "catalogs": [
-    { "type": "movie", "id": "all", "name": "Stream Nova Catalog" },
-    { "type": "series", "id": "all", "name": "Stream Nova Series Catalog" }
+    {
+      "type": "movie",
+      "id": "all",
+      "name": "Stream Nova Catalog",
+      "url": "https://vegettoson83.github.io/streamnova/catalog/movie/all.json"
+    },
+    {
+      "type": "series",
+      "id": "all",
+      "name": "Stream Nova Series Catalog",
+      "url": "https://vegettoson83.github.io/streamnova/catalog/series/all.json"
+    }
   ],
   "idPrefixes": ["streamnova_"]
 }
