@@ -1,0 +1,29 @@
+name: Scrape Sources Every 30min
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+
+jobs:
+  update-db:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run scraper
+        run: python streamnova/multi_scraper.py
+
+      - name: Commit & push
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add db/streamnova_all.json
+          git commit -m "Auto scrape update"
+          git push
