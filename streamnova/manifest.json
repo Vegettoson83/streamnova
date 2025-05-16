@@ -1,0 +1,13 @@
+{
+  "id": "org.streamnova.addon",
+  "version": "1.0.1",
+  "name": "Stream Nova",
+  "description": "Auto-scraping multi-source streaming addon with language flags",
+  "resources": ["catalog", "stream"],
+  "types": ["movie", "series"],
+  "catalogs": [
+    { "type": "movie", "id": "all", "name": "Stream Nova Catalog" },
+    { "type": "series", "id": "all", "name": "Stream Nova Series Catalog" }
+  ],
+  "idPrefixes": ["streamnova_"]
+}
