@@ -1,6 +1,7 @@
 from aiohttp import web
 import json
 from pathlib import Path
+import os  # <-- Add this line
 
 DB_PATH = Path("db/streamnova_all.json")
 
@@ -58,4 +59,5 @@ app.router.add_get("/catalog/{type}/{id}.json", catalog_handler)
 app.router.add_get("/stream/{type}/{id}.json", stream_handler)
 
 if __name__ == '__main__':
-    web.run_app(app, port=7000)
+    port = int(os.environ.get("PORT", 7000))  # <-- Use PORT env var if set, fallback to 7000 locally
+    web.run_app(app, port=port)
