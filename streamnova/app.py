@@ -1,7 +1,8 @@
 from aiohttp import web
 import json
 from pathlib import Path
-import os  # <-- Add this line
+import os
+import aiohttp_cors  # <-- Add this
 
 DB_PATH = Path("db/streamnova_all.json")
 
@@ -58,6 +59,19 @@ app.router.add_get("/manifest.json", manifest_handler)
 app.router.add_get("/catalog/{type}/{id}.json", catalog_handler)
 app.router.add_get("/stream/{type}/{id}.json", stream_handler)
 
+# ---- Add this block for CORS ----
+import aiohttp_cors
+cors = aiohttp_cors.setup(app, defaults={
+    "*": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*",
+        )
+})
+for route in list(app.router.routes()):
+    cors.add(route)
+# ---------------------------------
+
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 7000))  # <-- Use PORT env var if set, fallback to 7000 locally
+    port = int(os.environ.get("PORT", 7000))
     web.run_app(app, port=port)
