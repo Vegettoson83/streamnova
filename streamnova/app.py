@@ -2,7 +2,7 @@ from aiohttp import web
 import json
 from pathlib import Path
 import os
-import aiohttp_cors  # <-- Add this
+import aiohttp_cors
 
 DB_PATH = Path("db/streamnova_all.json")
 
@@ -20,8 +20,8 @@ async def manifest_handler(request):
         "resources": ["catalog", "stream"],
         "types": ["movie", "series"],
         "catalogs": [
-            {"type": "movie", "id": "all", "name": "Stream Nova Catalog"},
-            {"type": "series", "id": "all", "name": "Stream Nova Series Catalog"}
+            {"type": "movie", "id": "all", "name": "Stream Nova Movies"},
+            {"type": "series", "id": "all", "name": "Stream Nova Series"}
         ],
         "idPrefixes": ["streamnova_"]
     }
@@ -29,12 +29,17 @@ async def manifest_handler(request):
 
 async def catalog_handler(request):
     db = json.loads(DB_PATH.read_text(encoding="utf-8"))
+    req_type = request.match_info["type"]
     metas = []
+
     for i, item in enumerate(db):
-        flag = LANG_FLAGS.get(item["lang"].lower(), "")
+        if item.get("type", "movie") != req_type:
+            continue
+        flag = LANG_FLAGS.get(item.get("lang", "en").lower(), "")
         metas.append({
-            "id": f"streamnova_{i}",
-            "type": "movie",
+            "id": f"streamnova_{i}" if req_type == "movie"
+                 else f"{item['series_id']}:{item['season']}:{item['episode']}",
+            "type": req_type,
             "name": f"{flag} {item['title']}",
             "poster": "",
             "description": f"Source: {item['source'].capitalize()}, Lang: {item['lang'].upper()}"
@@ -44,33 +49,57 @@ async def catalog_handler(request):
 async def stream_handler(request):
     db = json.loads(DB_PATH.read_text(encoding="utf-8"))
     stream_id = request.match_info['id']
-    index = int(stream_id.replace("streamnova_", ""))
-    entry = db[index]
-    flag = LANG_FLAGS.get(entry["lang"].lower(), "")
-    stream = {
-        "title": entry['title'],
-        "url": entry['url'],
-        "name": f"{flag} {entry['lang'].upper()} | {entry['source']}"
-    }
-    return web.json_response({"streams": [stream]})
+
+    if ':' in stream_id:
+        # Handle series: series_id:season:episode
+        series_id, season, episode = stream_id.split(":")
+        season = int(season)
+        episode = int(episode)
+
+        for entry in db:
+            if (entry.get("type") == "series" and
+                entry.get("series_id") == series_id and
+                int(entry.get("season", 0)) == season and
+                int(entry.get("episode", 0)) == episode):
+                
+                flag = LANG_FLAGS.get(entry.get("lang", "en").lower(), "")
+                return web.json_response({
+                    "streams": [{
+                        "title": entry['title'],
+                        "url": entry['url'],
+                        "name": f"{flag} {entry['lang'].upper()} | {entry['source']}"
+                    }]
+                })
+    else:
+        # Fallback for movies: streamnova_#
+        index = int(stream_id.replace("streamnova_", ""))
+        entry = db[index]
+        flag = LANG_FLAGS.get(entry.get("lang", "en").lower(), "")
+        return web.json_response({
+            "streams": [{
+                "title": entry['title'],
+                "url": entry['url'],
+                "name": f"{flag} {entry['lang'].upper()} | {entry['source']}"
+            }]
+        })
+
+    return web.json_response({"streams": []})  # Not found fallback
 
 app = web.Application()
 app.router.add_get("/manifest.json", manifest_handler)
 app.router.add_get("/catalog/{type}/{id}.json", catalog_handler)
 app.router.add_get("/stream/{type}/{id}.json", stream_handler)
 
-# ---- Add this block for CORS ----
-import aiohttp_cors
+# Enable CORS
 cors = aiohttp_cors.setup(app, defaults={
     "*": aiohttp_cors.ResourceOptions(
-            allow_credentials=True,
-            expose_headers="*",
-            allow_headers="*",
-        )
+        allow_credentials=True,
+        expose_headers="*",
+        allow_headers="*",
+    )
 })
 for route in list(app.router.routes()):
     cors.add(route)
-# ---------------------------------
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 7000))
