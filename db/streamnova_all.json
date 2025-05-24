@@ -4,4 +4,28 @@
   "lang": "es",
   "source": "mediafire"
 }
+{
+  "meta": {
+    "id": "shiunji-family",
+    "type": "series",
+    "name": "The Shiunji Family Children",
+    "poster": "https://example.com/shiunji-poster.jpg",
+    "videos": [
+      {
+        "id": "shiunji-family:1:1",
+        "title": "Episode 1",
+        "season": 1,
+        "episode": 1
+      }
+    ]
+  },
+  "streams": {
+    "shiunji-family:1:1": [
+      {
+        "title": "1080p Stream",
+        "url": "https://jshtdpi85it3.tnmr.org/hls2/04/01957/76c9beeg1051_h/index-v1-a1.m3u8?t=hog-kYmED2yyJWKrwc4xN2aUD4Sadxg5U3lZQaas3gU&s=1748115038&e=28800&f=9788039&i=0.3&sp=0"
+      }
+    ]
+  }
+}
 
