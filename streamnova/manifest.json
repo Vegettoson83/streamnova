@@ -1,23 +1,37 @@
 {
   "id": "org.streamnova.addon",
-  "version": "1.0.1",
-  "name": "Stream Nova",
-  "description": "Auto-scraping multi-source streaming addon with language flags",
+  "version": "1.0.3",
+  "name": "StreamNova",
+  "description": "Multi-source anime streaming addon with auto-scraping from various sources",
   "resources": ["catalog", "stream"],
   "types": ["movie", "series"],
   "catalogs": [
     {
       "type": "movie",
-      "id": "all",
-      "name": "Stream Nova Catalog",
-      "url": "https://vegettoson83.github.io/streamnova/catalog/movie/all.json"
+      "id": "streamnova_movies", 
+      "name": "StreamNova Movies",
+      "extra": [
+        {"name": "search", "isRequired": false},
+        {"name": "skip", "isRequired": false}
+      ]
     },
     {
       "type": "series",
-      "id": "all",
-      "name": "Stream Nova Series Catalog",
-      "url": "https://vegettoson83.github.io/streamnova/catalog/series/all.json"
+      "id": "streamnova_series",
+      "name": "StreamNova Series", 
+      "extra": [
+        {"name": "search", "isRequired": false},
+        {"name": "skip", "isRequired": false}
+      ]
     }
   ],
-  "idPrefixes": ["streamnova_"]
+  "idPrefixes": ["streamnova_"],
+  "background": "https://i.imgur.com/t8wVwcg.jpg",
+  "logo": "https://i.imgur.com/44rdZux.png",
+  "contactEmail": "streamnova@example.com",
+  "behaviorHints": {
+    "adult": false,
+    "p2p": false,
+    "configurable": true
+  }
 }
